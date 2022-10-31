@@ -1,4 +1,3 @@
-
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
@@ -14,6 +13,8 @@ class UserModel(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -27,3 +28,19 @@ class UserModel(AbstractBaseUser, PermissionsMixin):
         db_table = 'users'
         verbose_name = 'User'
         verbose_name_plural = 'Users'
+
+
+class OTP(models.Model):
+    user = models.OneToOneField(UserModel, on_delete=models.CASCADE)
+    otp = models.CharField(max_length=8)
+    expiry = models.DateTimeField(default=timezone.now() + timezone.timedelta(seconds=60 * 5))
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.user
+
+    class Meta:
+        db_table = 'otp'
+        verbose_name = 'OTP'
+        verbose_name_plural = 'OTPs'
